@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard</title>
+<style>
+body { 
+    font-family: 'Poppins', sans-serif; 
+    margin: 0; 
+    background: linear-gradient(to right, #ff758c, #ff7eb3); 
+    color: white;
+}
+
+/* ===== Navbar ===== */
+nav { 
+    background: rgba(0,0,0,0.7); 
+    padding: 15px 30px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+nav a { 
+    color: white; 
+    margin: 0 10px; 
+    text-decoration: none; 
+    font-weight: 600; 
+}
+nav a:hover { text-decoration: underline; }
+
+/* ===== Container ===== */
+.container { 
+    padding: 40px; 
+    max-width: 600px; 
+    margin: 60px auto; 
+    background: rgba(0,0,0,0.6); 
+    border-radius: 20px; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.container h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffeaea;
+}
+
+/* ===== Details Card ===== */
+.details p {
+    font-size: 18px;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+.details span {
+    font-weight: bold;
+    color: #fff0f3;
+}
+
+/* ===== Logout Button ===== */
+button { 
+    display: block;
+    margin: 30px auto 0;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 16px;
+    transition: 0.3s;
+}
+button:hover { background-color: #ff4757; }
+
+</style>
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<nav>
+   <div style="font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: bold; color: white;">
+    Doctor Portal
+</div>
+
+    <div id="navLinks"></div>
+</nav>
+
+<!-- ===== Doctor Profile Section ===== -->
+<div class="container">
+    <h1>Welcome, Dr. <span id="doctorName"></span> 👨‍⚕️</h1>
+    <div class="details">
+        <p><span>Id:</span> <span id="doctorId"></span></p>
+        <p><span>Email:</span> <span id="doctorEmail"></span></p>
+        <p><span>Specialization:</span> <span id="doctorSpec"></span></p>
+        <p><span>Experience:</span> <span id="doctorExp"></span> years</p>
+        <p><span>Consultation Fee:</span> ₹<span id="doctorFee"></span></p>
+        <p><span>Description:</span> <span id="doctorDesc"></span></p>
+    </div>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+// get user data
+const user = JSON.parse(localStorage.getItem('user'));
+const role = localStorage.getItem('role');
+const navLinks = document.getElementById('navLinks');
+
+// if not logged in
+if (!user || role !== 'doctor') {
+    alert("Please login first!");
+    window.location.href = 'doctorLogin.html';
+} else {
+    // navbar for logged doctor
+    navLinks.innerHTML = `
+       <a href="./doctorHome.html">Home</a>
+<a href="Appoinmentlist.html">Appointments</a>
+<a href="./doctorProfile.html">Profile</a>
+<a href="#" onclick="logout()">Logout</a>
+
+    `;
+}
+
+// populate profile
+document.getElementById('doctorId').innerText = user.id || "N/A";
+document.getElementById('doctorName').innerText = user.fullname || "Doctor";
+document.getElementById('doctorEmail').innerText = user.email || "N/A";
+document.getElementById('doctorSpec').innerText = user.specialization || "N/A";
+document.getElementById('doctorExp').innerText = user.experience || "0";
+document.getElementById('doctorFee').innerText = user.fee || "0";
+document.getElementById('doctorDesc').innerText = user.description || "No description available";
+
+// logout function
+function logout(){
+    localStorage.clear();
+    window.location.href = '../index.html';
+}
+</script>
+
+</body>
+</html>

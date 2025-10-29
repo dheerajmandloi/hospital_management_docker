@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Home</title>
+<style>
+/* ===== Body & Layout ===== */
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    margin:0; 
+    background: linear-gradient(to right, #ff758c, #ff7eb3); 
+    color: white; 
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== Navbar ===== */
+nav { 
+    background: rgba(0,0,0,0.7); 
+    padding: 15px 30px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+nav a { 
+    color: white; 
+    margin: 0 10px; 
+    text-decoration: none; 
+    font-weight: bold; 
+}
+nav a:hover { 
+    text-decoration: underline; 
+}
+
+/* ===== Container ===== */
+.container { 
+    padding: 30px; 
+    max-width: 800px; 
+    margin: 50px auto 30px auto; 
+    background: rgba(0,0,0,0.5); 
+    border-radius: 15px; 
+    text-align: center;
+    display: inline-block;   /* Adjusts width to content */
+}
+
+/* Doctor Specialization Text */
+.doctor-spec { 
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.5rem;   
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Quotes */
+.quote {
+    font-style: italic;
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #ffd700;
+}
+
+/* Footer */
+footer {
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ffd700;
+    margin-top: auto; /* Pushes footer to bottom */
+}
+
+/* Buttons (if needed later) */
+button, .logout-btn { 
+    margin-top: 20px; 
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    background-color: #ff6b6b; 
+    color:white; 
+    font-size: 16px;
+}
+button:hover, .logout-btn:hover { 
+    opacity:0.9; 
+}
+</style>
+</head>
+<body>
+<!-- Navbar -->
+<nav>
+   <div style="font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: bold; color: white;">
+    Doctor Portal
+</div>
+
+    <div id="navLinks">
+        <!-- Links dynamically loaded from JS -->
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+    <h1>Welcome, <span id="doctorName"></span></h1>
+    <p class="doctor-spec">You are the best doctor in <strong><span id="doctorSpec"></span></strong></p>
+
+    <p class="quote">"Healing is a matter of time, but it is sometimes also a matter of opportunity."</p>
+    <p class="quote">"The good physician treats the disease; the great physician treats the patient who has the disease."</p>
+</div>
+
+<!-- Footer -->
+<footer>
+    &copy; 2025 Hospital Management | All Rights Reserved
+</footer>
+
+<script>
+/* ===== User & Navbar ===== */
+const user = JSON.parse(localStorage.getItem('user'));
+const role = localStorage.getItem('role');
+const navLinks = document.getElementById('navLinks');
+
+// Not logged in or wrong role
+if (!user || role !== 'doctor') {
+    navLinks.innerHTML = `
+        <a href="index.html">Home</a>
+        <a href="doctorLogin.html">Login</a>
+        <a href="doctorRegister.html">Register</a>
+    `;
+    alert("Please login first!");
+    window.location.href = 'doctorLogin.html';
+} else {
+    // Logged-in navbar
+    navLinks.innerHTML = `
+        <a href="./doctorHome.html">Home</a>
+        <a href="Appoinmentlist.html">Appointments</a>
+        <a href="./doctorProfile.html">Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+    `;
+}
+
+// Display doctor info
+if (user) {
+    document.getElementById('doctorName').innerText = user.fullname || "Doctor";
+    document.getElementById('doctorSpec').innerText = user.specialization || "your field";
+}
+
+// Logout function
+function logout(){
+    localStorage.clear();
+    window.location.href = '../index.html';
+}
+</script>
+</body>
+</html>

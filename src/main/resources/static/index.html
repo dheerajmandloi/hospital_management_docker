@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Management</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
+    color: #fff; min-height: 100vh;
+}
+
+/* Navbar */
+nav {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background: rgba(0,0,0,0.7);
+    padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+nav div:first-child { font-size: 1.5rem; font-weight: bold; }
+nav div a {
+    color:white;
+    margin-left:20px;
+    text-decoration:none;
+    font-weight:500;
+    transition:0.3s;
+}
+nav div a:hover { color:#4ecdc4; text-decoration:underline; }
+
+/* Container */
+.container {
+    background: rgba(0,0,0,0.6); 
+    padding: 50px; 
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 90%; max-width: 600px;
+    margin: 50px auto; text-align:center;
+}
+h1 { font-size: 2.5rem; margin-bottom: 20px; }
+p { font-size: 1.2rem; margin-bottom: 30px; }
+
+/* Buttons */
+button {
+    margin: 10px; padding: 15px 40px; font-size: 18px;
+    border: none; border-radius: 10px; cursor: pointer;
+    transition:0.3s;
+}
+button:hover { transform: scale(1.05); }
+.doctor { background-color:#ff6b6b; color:#fff; }
+.patient { background-color:#4ecdc4; color:#fff; }
+
+/* Quotes */
+.quote { font-style: italic; margin-top: 20px; font-size: 1rem; color:#ffd700; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+    <div>Hospital Management</div>
+    <div id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="#" id="appointmentsLink">Appointments</a>
+        <a href="patient/patientContact.html" id="contactLink">Contact</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="register.html" id="registerLink">Register</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+    </div>
+</nav>
+
+
+<!-- Container -->
+<div class="container" id="mainContainer">
+    <h1 id="welcomeText">Welcome to Hospital Management</h1>
+    <div id="guestMessage">
+        <p>Please login to access your dashboard.</p>
+        <p class="quote">"Health is wealth, take care of it!"</p>
+        <p class="quote">"Your hospital, your health, your choice."</p>
+    </div>
+</div>
+
+<script>
+// Get user data from localStorage
+const user = JSON.parse(localStorage.getItem('user'));
+const role = localStorage.getItem('role');
+
+const welcomeText = document.getElementById('welcomeText');
+const guestMessage = document.getElementById('guestMessage');
+
+const appointmentsLink = document.getElementById('appointmentsLink');
+const loginLink = document.getElementById('loginLink');
+const registerLink = document.getElementById('registerLink');
+const logoutLink = document.getElementById('logoutLink');
+
+if (user && role) {
+
+    // ✅ Auto redirect based on role
+    if (role === 'patient' && !window.location.href.includes('/patient/patientHome.html')) {
+       window.location.href = 'patient/patientHome.html';
+
+    } 
+    else if (role === 'doctor' && !window.location.href.includes('/doctor/doctorHome.html')) {
+        window.location.href = 'doctor/doctorHome.html';
+
+    }
+
+    // Logged-in state (for current page)
+    welcomeText.innerText = `Welcome, ${user.fullname}`;
+    guestMessage.style.display = 'none';
+
+    // Navbar update
+    loginLink.style.display = 'none';
+    registerLink.style.display = 'none';
+    logoutLink.style.display = 'inline';
+    appointmentsLink.style.display = 'inline';
+    appointmentsLink.innerText = role === 'patient' ? 'Appointments' : 'Appointment List';
+
+    // Logout functionality
+    logoutLink.onclick = () => {
+        localStorage.clear();
+        alert("You have been logged out successfully!");
+        window.location.href = "index.html";
+    };
+} else {
+    // Guest state
+    appointmentsLink.style.display = 'none';
+    logoutLink.style.display = 'none';
+    loginLink.style.display = 'inline';
+    registerLink.style.display = 'inline';
+}
+</script>
+
+</body>
+</html>

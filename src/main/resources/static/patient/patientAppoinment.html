@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Appointment</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+nav div:first-child { font-size: 1.6rem; font-weight: bold; }
+nav div a { color: white; margin-left: 20px; text-decoration: none; font-weight: 500; transition: 0.3s; }
+nav div a:hover { color: #4ecdc4; text-decoration: underline; }
+nav div a.active { color: #ffd700; text-decoration: underline; }
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+.container h1 { text-align: center; margin-bottom: 25px; font-size: 2rem; }
+form { display: flex; flex-direction: column; gap: 15px; }
+input, textarea { padding: 10px; border-radius: 8px; border: none; outline: none; font-size: 1rem; }
+textarea { resize: none; }
+button {
+    padding: 12px; border: none; border-radius: 8px;
+    background-color: #4ecdc4; color: white; font-size: 1rem;
+    cursor: pointer; transition: 0.3s;
+}
+button:hover { background-color: #38b3a2; transform: translateY(-2px); }
+#doctorSuggestion { background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px; margin-top: 10px; }
+.doctor-card h3 { margin-bottom: 8px; color: #ffd700; }
+.appointment-list { margin-top: 40px; }
+.appointment-card {
+    background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;
+    margin-bottom: 15px; position: relative; transition: 0.3s;
+}
+.appointment-card:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
+.appointment-card p { margin: 5px 0; }
+.status-badge {
+    position: absolute; top: 15px; right: 15px;
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; color: white;
+}
+.status-pending { background: #ff6b6b; }
+.status-confirmed { background: #28c76f; }
+footer { margin-top: auto; background: rgba(0,0,0,0.6); padding: 15px; text-align: center; color: #ffd700; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<nav>
+    <div>Patient Dashboard</div>
+    <div>
+        <a href="patientHome.html">Home</a>
+        <a href="patientDoctorList.html">Doctor List</a>
+        <a href="patientContact.html">Contact</a>
+        <a href="patientAppoinment.html" class="active">Appointments</a>
+        <a href="patientProfile.html">Profile</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Book an Appointment</h1>
+    
+    <form id="appointmentForm">
+        <label><strong>Appointment Date:</strong></label>
+        <input type="date" id="appointmentDate" required>
+
+        <label><strong>Symptoms:</strong></label>
+        <textarea id="symptoms" rows="3" placeholder="Describe your symptoms..." required onblur="getDoctorSuggestion()"></textarea>
+
+        <div id="doctorSuggestion"></div>
+
+        <label><strong>Address:</strong></label>
+        <textarea id="address" rows="2" placeholder="Enter your address..." required></textarea>
+
+        <label><strong>Budget:</strong></label>
+        <input type="number" id="budget" placeholder="Enter your budget (₹)" required>
+
+        <label><strong>Government ID:</strong></label>
+        <input type="text" id="govtId" placeholder="Enter Govt. ID (e.g., Aadhaar)" required>
+
+        <label><strong>Doctor ID:</strong></label>
+        <input type="text" id="doctorId" placeholder="Enter Doctor ID manually" required>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <!-- <div class="appointment-list" id="appointmentList">
+        <h2>Your Appointments</h2>
+    </div> -->
+</div>
+
+<footer>
+    &copy; 2025 Hospital Management | All Rights Reserved
+</footer>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+const role = localStorage.getItem("role");
+if (!user || role !== "patient") {
+    alert("Please login first!");
+    window.location.href = "patientLogin.html";
+}
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.clear();
+    window.location.href = "patientLogin.html";
+});
+
+async function getDoctorSuggestion() {
+    const symptoms = document.getElementById("symptoms").value.trim();
+    const div = document.getElementById("doctorSuggestion");
+    if (!symptoms) return;
+
+    div.innerHTML = "🔍 Finding the best doctor for you...";
+
+    try {
+        const res = await fetch(`http://localhost:8080/api/ai?symptoms=${encodeURIComponent(symptoms)}`);
+        const doctor = await res.json();
+
+        if (doctor && doctor.fullname) {
+            div.innerHTML = `
+                <div class="doctor-card">
+                    <h3>Suggested Doctor 👩‍⚕️</h3>
+                    <p><strong>ID:</strong> ${doctor.id}</p>
+                    <p><strong>${doctor.fullname}</strong></p>
+                    <p>Specialization: ${doctor.specialization}</p>
+                    <p>Experience: ${doctor.experience} years</p>
+                    <p>Fees: ₹${doctor.fees || doctor.fee || "N/A"}</p>
+                </div>
+            `;
+        } else {
+            div.innerHTML = "⚠️ No suitable doctor found.";
+        }
+    } catch (err) {
+        div.innerHTML = "❌ Error fetching recommendation.";
+        console.error(err);
+    }
+}
+
+const form = document.getElementById("appointmentForm");
+const listContainer = document.getElementById("appointmentList");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const appointment = {
+        appointmentDate: document.getElementById("appointmentDate").value,
+        symptoms: document.getElementById("symptoms").value,
+        address: document.getElementById("address").value,
+        budget: document.getElementById("budget").value,
+        govtId: document.getElementById("govtId").value,
+        doctorId: document.getElementById("doctorId").value,
+        status: "Pending"
+    };
+
+    if (!appointment.doctorId) {
+        alert("Please enter Doctor ID before booking!");
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8080/appointment/add/${user.id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(appointment)
+        });
+        const msg = await res.text();
+        alert(msg);
+        form.reset();
+        document.getElementById("doctorSuggestion").innerHTML = "";
+        getAppointments();
+    } catch (err) {
+        alert("Error while saving appointment!");
+        console.error(err);
+    }
+});
+
+// async function getAppointments() {
+//     try {
+//         const res = await fetch(`http://localhost:8080/appointment/patient/${user.id}`);
+//         const data = await res.json();
+//         listContainer.innerHTML = "<h2>Your Appointments</h2>";
+
+//         if (!data || data.length === 0) {
+//             listContainer.innerHTML += "<p>No appointments found.</p>";
+//             return;
+//         }
+
+//         data.forEach(a => {
+//             const status = a.status || "Pending";
+//             const meetingTime = a.meetingTime ? a.meetingTime : "Not Scheduled Yet";
+//             const doctorName = a.doctor ? a.doctor.fullname : "Doctor";
+
+//             const card = document.createElement("div");
+//             card.classList.add("appointment-card");
+
+//             card.innerHTML = `
+//                 <span class="status-badge ${status === 'Confirmed' ? 'status-confirmed' : 'status-pending'}">
+//                     ${status}
+//                 </span>
+//                 <p><strong>Appointment ID:</strong> ${a.id}</p>
+//                 <p><strong>Date:</strong> ${a.appointmentDate}</p>
+//                 <p><strong>Symptoms:</strong> ${a.symptoms}</p>
+//                 <p><strong>Address:</strong> ${a.address}</p>
+//                 <p><strong>Govt ID:</strong> ${a.govtId}</p>
+               
+//                 <p><strong>Meeting Time:</strong> ${meetingTime}</p>
+//                 ${status === "Confirmed"
+//                     ? `<p style="margin-top:10px; background:#28c76f; color:white; padding:8px; border-radius:6px; text-align:center;">
+//                         ✅ Your appointment has been successfully confirmed by <strong>Dr. ${doctorName}</strong>
+//                       </p>`
+//                     : ""}
+//             `;
+//             listContainer.appendChild(card);
+//         });
+//     } catch (err) {
+//         console.error(err);
+//         listContainer.innerHTML = "<p>Failed to load appointments.</p>";
+//     }
+// }
+
+// getAppointments();
+</script>
+
+</body>
+</html>

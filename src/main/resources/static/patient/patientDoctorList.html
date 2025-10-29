@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Available Doctors</title>
+<style>
+/* ===== General Layout ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: linear-gradient(to right, #43cea2, #185a9d);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== Navbar ===== */
+nav {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: 600;
+}
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Header ===== */
+h1 {
+    text-align: center;
+    margin: 30px 0;
+    color: white;
+    font-size: 2rem;
+}
+
+/* ===== Container ===== */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 30px 40px 30px;
+    flex: 1;
+}
+
+/* ===== Doctor Card ===== */
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+.card h2 {
+    color: #185a9d;
+    margin-bottom: 8px;
+}
+.card p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+}
+.label {
+    font-weight: 600;
+}
+nav div a.active { color: #ffd700; text-decoration: underline; }
+
+/* ===== Button ===== */
+.book-btn {
+    margin-top: 12px;
+    background: #43cea2;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.book-btn:hover {
+    background: #36b88a;
+}
+
+/* ===== Loader ===== */
+#loader {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #ffd700;
+    margin-top: 40px;
+}
+
+/* ===== Footer ===== */
+footer {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<nav>
+    <div style="font-size: 1.5rem; font-weight: bold;">Patient Portal</div>
+    <div id="navLinks"></div>
+</nav>
+
+<!-- ===== Header ===== -->
+<h1>Available Doctors</h1>
+
+<!-- ===== Loader ===== -->
+<div id="loader">Loading doctors...</div>
+
+<!-- ===== Container ===== -->
+<div class="container" id="doctorContainer"></div>
+
+<!-- ===== Footer ===== -->
+<footer>&copy; 2025 Hospital Management | All Rights Reserved</footer>
+
+<script>
+// ===== Navbar setup =====
+const user = JSON.parse(localStorage.getItem('user'));
+const role = localStorage.getItem('role');
+const navLinks = document.getElementById('navLinks');
+
+if (!user || role !== 'patient') {
+    alert("Please login first!");
+    window.location.href = 'patientLogin.html';
+} else {
+    navLinks.innerHTML = `
+      <a href="patientHome.html">Home</a>
+        <a href="patientDoctorList.html" class="active">Doctor List</a>
+        <a href="patientContact.html">Contact</a>
+        <a href="patientAppoinment.html" >Appointments</a>
+        <a href="patientProfile.html">Profile</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    `;
+}
+
+function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
+
+// ===== Fetch Doctors =====
+const loader = document.getElementById('loader');
+const container = document.getElementById('doctorContainer');
+
+fetch('http://localhost:8080/api/list')
+.then(res => res.json())
+.then(doctors => {
+    loader.style.display = 'none';
+    if (doctors.length === 0) {
+        container.innerHTML = "<p style='text-align:center;color:white;'>No doctors found.</p>";
+        return;
+    }
+
+    doctors.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <h2>${doc.fullname}</h2>
+            <p><span class="label">Doctor ID:</span> ${doc.id}</p>
+            <p><span class="label">Specialization:</span> ${doc.specialization}</p>
+            <p><span class="label">Experience:</span> ${doc.experience} years</p>
+            <p><span class="label">Consultation Fee:</span> ₹${doc.fee}</p>
+            <p><span class="label">Description:</span> ${doc.description}</p>
+            
+            <button class="book-btn" onclick="bookAppointment(${doc.id})">Book Appointment</button>
+        `;
+        container.appendChild(card);
+    });
+})
+.catch(err => {
+    loader.innerText = "Failed to load doctors.";
+    console.error(err);
+});
+
+// ===== Book Appointment Redirect =====
+function bookAppointment(doctorId) {
+    localStorage.setItem("selectedDoctorId", doctorId);
+    window.location.href = "appointmentForm.html";
+}
+</script>
+
+</body>
+</html>

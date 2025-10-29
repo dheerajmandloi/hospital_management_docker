@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - Hospital Management</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
+    color: #fff; min-height: 100vh;
+    display: flex; justify-content:center; align-items:center;
+}
+
+/* Navbar */
+nav {
+    display:flex; justify-content:space-between; align-items:center;
+    background: rgba(0,0,0,0.7); padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    width:100%;
+    position:absolute; top:0; left:0;
+}
+nav div:first-child { font-size: 1.5rem; font-weight: bold; }
+nav div a { color:white; margin-left:20px; text-decoration:none; font-weight:500; transition:0.3s;}
+nav div a:hover { color:#4ecdc4; text-decoration:underline; }
+
+/* Container */
+.container {
+    background: rgba(0,0,0,0.6); 
+    padding: 50px; border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 90%; max-width: 500px; text-align:center;
+}
+h1 { font-size: 2rem; margin-bottom: 30px; }
+button {
+    margin: 15px; padding: 15px 40px; font-size: 18px;
+    border: none; border-radius: 10px; cursor: pointer; transition:0.3s;
+}
+button:hover { transform: scale(1.05); }
+.doctor { background-color:#ff6b6b; color:#fff; }
+.patient { background-color:#4ecdc4; color:#fff; }
+</style>
+</head>
+<body>
+
+<nav>
+    <div>Hospital Management</div>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+    </div>
+</nav>
+
+
+<div class="container">
+    <h1>Select your role to Register</h1>
+    <button class="doctor" onclick="location.href='doctor/doctorRegister.html'">Doctor Register</button>
+    <button class="patient" onclick="location.href='patient/patientRegister.html'">Patient Register</button>
+</div>
+
+</body>
+</html>

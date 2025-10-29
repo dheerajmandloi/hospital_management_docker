@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Login</title>
+<style>
+/* ===== Reset & Body ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+   background: linear-gradient(to right, #ff758c, #ff7eb3); 
+    color: white; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+nav div:first-child { font-size: 1.5rem; font-weight: bold; }
+nav div a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+nav div a:hover { color: #ffb3c6; text-decoration: underline; }
+
+/* Center Form Wrapper */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Form */
+form { 
+    background: rgba(255,255,255,0.9);
+    padding: 30px; 
+    border-radius: 15px; 
+    width: 300px; 
+    text-align: center;
+    color: #000;
+}
+input, button { 
+    width: 100%; 
+    margin: 10px 0; 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+}
+button { 
+    background-color: #ff6b6b; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+    transition: 0.3s; 
+}
+button:hover { opacity: 0.9; }
+p a { color: #f42828; text-decoration: none; transition: 0.3s; }
+p a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+    <div>Doctor Portal</div>
+    <div>
+        <a href="../index.html">Home</a>
+        <a href="#" id="appointmentsLink">Appointments</a>
+        <a href="doctorLogin.html" id="loginLink">Login</a>
+        <a href="doctorRegister.html" id="registerLink">Register</a>
+        <a href="#" id="profileLink">Profile</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+    </div>
+</nav>
+
+<!-- Login Form Centered -->
+<main>
+  <form id="doctorLoginForm">
+      <h2>Doctor Login</h2>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="doctorRegister.html">Register</a></p>
+  </form>
+</main>
+
+<script>
+// Navbar elements
+const appointmentsLink = document.getElementById('appointmentsLink');
+const loginLink = document.getElementById('loginLink');
+const registerLink = document.getElementById('registerLink');
+const profileLink = document.getElementById('profileLink');
+const logoutLink = document.getElementById('logoutLink');
+
+// Check if user already logged in
+const existingUser = JSON.parse(localStorage.getItem('user'));
+const existingRole = localStorage.getItem('role');
+
+function updateNavbar() {
+    if(existingUser && existingRole === 'doctor'){
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+        appointmentsLink.style.display = 'inline';
+        profileLink.style.display = 'inline';
+        logoutLink.style.display = 'inline';
+        appointmentsLink.innerText = 'Appointments';
+    } else {
+        appointmentsLink.style.display = 'none';
+        profileLink.style.display = 'none';
+        logoutLink.style.display = 'none';
+        loginLink.style.display = 'inline';
+        registerLink.style.display = 'inline';
+    }
+}
+
+// Logout
+logoutLink.onclick = () => {
+    localStorage.clear();
+    location.reload();
+};
+
+// Profile click
+profileLink.onclick = () => {
+    window.location.href = 'doctorDashboard.html';
+};
+
+updateNavbar();
+
+// Login form submit
+document.getElementById('doctorLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        role: "doctor"
+    };
+    try {
+        const res = await fetch('http://localhost:8080/patient/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if(!res.ok) throw new Error('Invalid login');
+        const result = await res.json();
+        localStorage.setItem('user', JSON.stringify(result.userData));
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('role', result.role);
+        updateNavbar();
+        window.location.href = 'doctorHome.html';
+    } catch(err) { alert(err.message); }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Registration</title>
+<style>
+/* ===== Reset & Body ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { 
+    font-family: Arial, Helvetica, sans-serif; 
+    background: linear-gradient(to right, #ff758c, #ff7eb3); 
+    color: white; 
+    min-height: 100vh;
+}
+
+/* ===== Navbar ===== */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.7);
+    padding: 15px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+nav div:first-child { font-size: 1.5rem; font-weight: bold; }
+nav div a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+nav div a:hover {
+    color: #ffb3c6;
+    text-decoration: underline;
+}
+
+/* ===== Form Container ===== */
+form { 
+    background: rgba(255,255,255,0.9); 
+    padding: 30px; 
+    border-radius: 15px; 
+    width: 300px; 
+    margin: 50px auto; 
+    text-align: center;
+    color: #000;
+}
+
+/* ===== Inputs & Button ===== */
+input, button { 
+    width: 100%; 
+    margin: 10px 0; 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+}
+button { 
+    background-color: #ff6b6b; 
+    color: white; 
+    border: none; 
+    cursor: pointer; 
+    transition: 0.3s; 
+}
+button:hover { opacity: 0.9; }
+
+/* ===== Login Link ===== */
+p a { color: #ff6b6b; text-decoration: none; transition: 0.3s; }
+p a:hover { text-decoration: underline; }
+
+/* ===== Responsive ===== */
+@media(max-width:768px){
+    nav { flex-direction: column; gap: 10px; }
+    nav div a { margin-left: 10px; margin-right:10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<nav>
+    <div>Doctor Portal</div>
+    <div>
+        <a href="../index.html">Home</a>
+        <a href="doctorLogin.html">Login</a>
+        <a href="doctorRegister.html">Register</a>
+    </div>
+</nav>
+
+<!-- ===== Registration Form ===== -->
+<form id="doctorForm">
+    <h2>Doctor Registration</h2>
+    <input type="text" id="fullname" placeholder="Full Name" required>
+    <input type="text" id="specialization" placeholder="Specialization" required>
+    <input type="number" id="experience" placeholder="Experience (years)" required>
+    <input type="number" id="fee" placeholder="Consultation Fee" required>
+    <input type="text" id="description" placeholder="Description">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Register</button>
+
+    <p style="text-align:center; margin-top:10px;">
+        Already have an account? 
+        <a href="doctorLogin.html">Login</a>
+    </p>
+</form>
+
+<script>
+document.getElementById('doctorForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        fullname: document.getElementById('fullname').value,
+        specialization: document.getElementById('specialization').value,
+        experience: document.getElementById('experience').value,
+        fee: document.getElementById('fee').value,
+        description: document.getElementById('description').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    };
+    try {
+        const res = await fetch('http://localhost:8080/api/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.text();
+        alert(result);
+        window.location.href = 'doctorLogin.html';
+    } catch(err) { 
+        console.error(err); 
+        alert('Error registering'); 
+    }
+});
+</script>
+</body>
+</html>

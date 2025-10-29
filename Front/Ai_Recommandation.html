@@ -1,0 +1,169 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2f3640;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        h2 {
+            color: #2f3640;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #44bd32;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4cd137;
+        }
+        .doctor-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+        .doctor-card h3 {
+            margin: 0;
+            color: #40739e;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Hospital Management System</h1>
+</header>
+
+<main>
+    <section>
+        <h2>Add Doctor</h2>
+        <input type="text" id="fullname" placeholder="Full Name">
+        <input type="text" id="specialization" placeholder="Specialization">
+        <input type="number" id="experience" placeholder="Experience (years)">
+        <input type="number" id="fee" placeholder="Consultation Fee">
+        <input type="text" id="description" placeholder="Description">
+        <button onclick="addDoctor()">Add Doctor</button>
+        <p id="addStatus"></p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Doctor List</h2>
+        <button onclick="loadDoctors()">Load All Doctors</button>
+        <div id="doctorList"></div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>AI Recommendation</h2>
+        <input type="text" id="disease" placeholder="Enter disease e.g. heart attack, pregnancy">
+        <button onclick="getRecommendation()">Get Recommended Doctor</button>
+        <div id="aiResult"></div>
+    </section>
+</main>
+
+<script>
+const apiBase = 'http://localhost:8080/api';
+
+// Add Doctor
+function addDoctor() {
+    const doctor = {
+        fullname: document.getElementById('fullname').value,
+        specialization: document.getElementById('specialization').value,
+        experience: parseInt(document.getElementById('experience').value),
+        fee: parseFloat(document.getElementById('fee').value),
+        description: document.getElementById('description').value
+    };
+
+    fetch(`${apiBase}/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(doctor)
+    })
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById('addStatus').innerText = data;
+        loadDoctors(); // Refresh doctor list
+    })
+    .catch(err => console.error(err));
+}
+
+// Load all doctors
+function loadDoctors() {
+    fetch(`${apiBase}/list`)
+        .then(res => res.json())
+        .then(doctors => {
+            const container = document.getElementById('doctorList');
+            container.innerHTML = '';
+            doctors.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'doctor-card';
+                div.innerHTML = `
+                    <h3>${d.fullname}</h3>
+                    <p><strong>Specialization:</strong> ${d.specialization}</p>
+                    <p><strong>Experience:</strong> ${d.experience} years</p>
+                    <p><strong>Fee:</strong> $${d.fee}</p>
+                    <p>${d.description}</p>
+                `;
+                container.appendChild(div);
+            });
+        })
+        .catch(err => console.error(err));
+}
+
+// AI Recommendation
+function getRecommendation() {
+    const disease = document.getElementById('disease').value;
+    fetch(`${apiBase}/ai?q=${encodeURIComponent(disease)}`)
+        .then(res => res.json())
+        .then(d => {
+            const container = document.getElementById('aiResult');
+            if(d) {
+                container.innerHTML = `
+                    <div class="doctor-card">
+                        <h3>${d.fullname}</h3>
+                        <p><strong>Specialization:</strong> ${d.specialization}</p>
+                        <p><strong>Experience:</strong> ${d.experience} years</p>
+                        <p><strong>Fee:</strong> $${d.fee}</p>
+                        <p>${d.description}</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<p>No recommendation found.</p>';
+            }
+        })
+        .catch(err => console.error(err));
+}
+
+// Load doctor list on page load
+window.onload = loadDoctors;
+</script>
+
+</body>
+</html> -->
